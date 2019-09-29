@@ -17,13 +17,13 @@ public:
     virtual ~Entity() = default;
     virtual Collision interact(const Ray& ray) const = 0;
     //virtual BoundingBox getBoundingBox() const = 0;
-    const Material& getMaterial() const { return *pMaterial; }
+    const Material* getMaterial() const { return pMaterial; }
 protected:
     Vector3f position;
     const Material* pMaterial;
 };
 
-class Sphere : protected Entity {
+class Sphere : public Entity {
 public:
     Sphere(const Vector3f& position_, float radius_, const Material* pMaterial_ = nullptr) : Entity(position_, pMaterial_), radius(radius_) {}
     Collision interact(const Ray& ray) const override;

@@ -1,5 +1,5 @@
 #include "light.h"
-
+#include <cstdio>
 LightInteraction PointLight::castOnPoint(const Vector3f& point) const {
     return LightInteraction(this, position - point, color * intensity);
 }

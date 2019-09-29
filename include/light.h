@@ -26,7 +26,7 @@ protected:
 class PointLight : public Light {
 public:
     PointLight(const Vector3f& position_, const Color& color_, float intensity_ = 1.0f) :
-        position(position), Light(color_, intensity_) {}
+        position(position_), Light(color_, intensity_) {}
     LightInteraction castOnPoint(const Vector3f& point) const override;
 private:
     Vector3f position;
@@ -35,7 +35,7 @@ private:
 class DirectionalLight : public Light {
 public:
     DirectionalLight(const Vector3f& direction_, const Color& color_, float intensity_ = 1.0f) :
-        direction(direction_), Light(color_, intensity_) {}
+        direction(direction_.normalized()), Light(color_, intensity_) {}
     LightInteraction castOnPoint(const Vector3f& point) const override;
 private:
     Vector3f direction;

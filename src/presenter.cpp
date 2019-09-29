@@ -5,7 +5,7 @@ void BmpPresenter::init(int w, int h) {
 }
 
 void BmpPresenter::setPixel(int x, int y, const Color& color) {
-    pImage->SetPixel(x, y, color.toVec());
+    pImage->SetPixel(x, pImage->Height() - 1 - y, color.toVec());
 }
 
 void BmpPresenter::finish(const char* argv) {

@@ -34,7 +34,7 @@ protected:
     int height;
 };
 
-class PerspectiveCamera : protected Camera {
+class PerspectiveCamera : public Camera {
 public:
     PerspectiveCamera(const Vector3f &center, const Vector3f &direction,
             const Vector3f &up, int imgW, int imgH, float angle) : Camera(center, direction, up, imgW, imgH) {
