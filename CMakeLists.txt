@@ -22,6 +22,7 @@ SET(SOURCES
              src/manager.cpp
              src/camera.cpp
              src/presenter.cpp
+             src/detector.cpp
              src/main.cpp)
 
 SET(CMAKE_CXX_STANDARD 11)

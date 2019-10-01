@@ -1,18 +1,15 @@
 #include <cmath>
+#include <iostream>
 #include "entities.h"
 
 Collision Sphere::interact(const Ray& ray) const {
-    auto a = ray.direction.squaredLength();
     auto delta = position - ray.from;
-    auto b = -2 * Vector3f::dot(ray.direction, delta);
-    auto c = delta.squaredLength() - radius * radius;
-	auto d = b * b - 4 * a * c;
-    if (d < 0) return Collision(&ray);
-    auto sd = sqrt(d);
-    auto greater = -b + sd;
-    if (greater <= 0) return Collision(&ray);
-    auto less = -b - sd;
-    auto dis = (less <= 0 ? greater : less) / (2 * a);
-    auto collisionPoint = ray.pointAt(dis);
-    return Collision(this, &ray, less > 0 ? collisionPoint - position : position - collisionPoint, collisionPoint, dis);
+    bool inside = delta.squaredLength() < radius_2;
+    float D = Vector3f::dot(delta, ray.direction);
+    if (!inside && D <= 0) return Collision(&ray, false);
+    float h_2 = delta.squaredLength() - D * D;
+    if (h_2 > radius_2) return Collision(&ray, false);
+    float d = inside ? D + sqrt(radius_2 - h_2) : D - sqrt(radius_2 - h_2);
+    auto cpoint = ray.pointAt(d);
+    return Collision(this, &ray, inside ? position - cpoint : cpoint - position, cpoint, d);
 }

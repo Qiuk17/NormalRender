@@ -7,10 +7,11 @@
 class Light;
 class LightInteraction {
 public:
-    LightInteraction(const Light* pLight_, const Vector3f& direction_, const Color& color_) : 
+    LightInteraction(const Light* pLight_, const Vector3f& direction_, float distance_, const Color& color_) : 
         pLight(pLight_), direction(direction_.normalized()), color(color_) {}
     const Light* pLight;
     Vector3f direction;
+    float distance;
     Color color;
 };
 

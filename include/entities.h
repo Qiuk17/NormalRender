@@ -25,13 +25,13 @@ protected:
 
 class Sphere : public Entity {
 public:
-    Sphere(const Vector3f& position_, float radius_, const Material* pMaterial_ = nullptr) : Entity(position_, pMaterial_), radius(radius_) {}
+    Sphere(const Vector3f& position_, float radius_, const Material* pMaterial_ = nullptr) : Entity(position_, pMaterial_), radius(radius_), radius_2(radius_ * radius_) {}
     Collision interact(const Ray& ray) const override;
 private:
-    float radius;
+    float radius, radius_2;
 };
 
-// class Plane : protected Entity {
+// class Plane : public Entity {
 // public:
 //     Plane(const Vector3f& normal_, float offset_, const Material* pMaterial_ = nullptr) : normal(normal_), offset(offset_), Entity(Vector3f() + offset_ * normal_, pMaterial_) {}
 //     Collision interact(const Ray& ray) const override;
@@ -40,7 +40,7 @@ private:
 //     float offset;
 // };
 
-// class Triangle : protected Entity {
+// class Triangle : public Entity {
 // public:
 //     Triangle(const Vector3f& p1_, const Vector3f& p2_, const Vector3f& p3_, const Material* pMaterial_ = nullptr) :
 //         p1(p1_), p2(p2_), p3(p3_), Entity(p1_, pMaterial_), normal(Vector3f::cross(p2_ - p1_, p3_ - p1_).normalized()) {}
@@ -50,7 +50,7 @@ private:
 //     Vector3f normal;
 // };
 
-// class Mesh : protected Entity {
+// class Mesh : public Entity {
 // public:
 //     Mesh(const char* objPath, const Vector3f& position_ = Vector3f(), const Material* pMaterial_ = nullptr) : Entity(position_, pMaterial_) {
 
@@ -61,6 +61,10 @@ private:
 // private:
 //     std::vector<Vector3f> vertexArray;
 //     std::vector<Triangle*> trianglePointerArray;
+// };
+
+// class Transform : public Entity {
+
 // };
 
 #endif

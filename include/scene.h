@@ -9,6 +9,7 @@
 #include "color.h"
 #include "camera.h"
 #include "presenter.h"
+#include "detector.h"
 
 class AbstractScene {
 public:
@@ -22,17 +23,17 @@ public:
 	void setBackgroundColor(const Color& color) { background = color; }
 	void registerCamera(Camera* pCamera_) { if (pCamera != nullptr) delete pCamera; pCamera = pCamera_; }
 	void registerPresenter(Presenter* pPresenter_) { if (pPresenter != nullptr) delete pPresenter; pPresenter = pPresenter_; }
+	void registerDetector(Detector* pDetector_) {if (pDetector != nullptr) delete pDetector; pDetector = pDetector_;}
 	
 protected:
     std::vector<Material*> vecMaterial;
     std::vector<Entity*>   vecEntity;
     std::vector<Light*>    vecLight;
-    Material** pMaterials = nullptr;
-    Entity**   pEntities = nullptr;
     Light**    pLights = nullptr;
     Camera*    pCamera = nullptr;
     Presenter* pPresenter = nullptr;
-    int countMaterial = 0, countEntity = 0, countLight = 0;
+	Detector* pDetector = nullptr;
+    int countLight = 0;
 	Color background = Color();
 };
 
