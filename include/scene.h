@@ -1,5 +1,5 @@
-#ifndef _MANAGER_H
-#define _MANAGER_H
+#ifndef _SCENE_H
+#define _SCENE_H
 
 #include <vector>
 

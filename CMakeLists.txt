@@ -19,7 +19,7 @@ SET(SOURCES
              src/collision.cpp
              src/entities.cpp
              src/materials.cpp
-             src/manager.cpp
+             src/scene.cpp
              src/camera.cpp
              src/presenter.cpp
              src/detector.cpp

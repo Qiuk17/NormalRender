@@ -1,4 +1,4 @@
-#include "manager.h"
+#include "scene.h"
 #include <iostream>
 AbstractScene::~AbstractScene() {
 	for (auto p : vecEntity) delete p;

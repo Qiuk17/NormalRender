@@ -1,4 +1,4 @@
-#include "manager.h"
+#include "scene.h"
 
 int main() {
 	RaycastScene rs;
