@@ -33,9 +33,11 @@ void RaycastScene::render(const char* finishArgv) {
 			auto color = Color();
 			for (int i = 0; i < countLight; i++) {
 				auto li = pLights[i]->castOnPoint(col.point);
-				if (Vector3f::dot(li.direction, col.normal) > 0 && !pDetector->isRayCollided(Ray(col.point + li.direction, li.direction), 1e-3f, li.distance))
+				if (Vector3f::dot(li.direction, col.normal) > 0 && !pDetector->getClosestCollision(Ray(col.point + li.direction * 1e-3, li.direction)).isValid)
 					color += col.pEntity->getMaterial()->getColor(col, *pLights[i]).restriction();
+				else color = Color(1, 0, 0);
 			}
+			
 			color.restricted();
 			pPresenter->setPixel(x, y, color);
 		}

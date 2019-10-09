@@ -31,14 +31,17 @@ private:
     float radius, radius_2;
 };
 
-// class Plane : public Entity {
-// public:
-//     Plane(const Vector3f& normal_, float offset_, const Material* pMaterial_ = nullptr) : normal(normal_), offset(offset_), Entity(Vector3f() + offset_ * normal_, pMaterial_) {}
-//     Collision interact(const Ray& ray) const override;
-// private:
-//     Vector3f normal;
-//     float offset;
-// };
+class Plain : public Entity {
+public:
+    Plain(const Vector3f& normal_, float offset_, const Material* pMaterial_ = nullptr) : normal(normal_), offset(offset_), Entity(Vector3f() + offset_ * normal_, pMaterial_) {
+        origin = - Vector3f::dot(normal, position);
+    }
+    Collision interact(const Ray& ray) const override;
+private:
+    Vector3f normal;
+    Vector3f origin;
+    float offset;
+};
 
 // class Triangle : public Entity {
 // public:
