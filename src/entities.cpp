@@ -13,3 +13,23 @@ Collision Sphere::interact(const Ray& ray) const {
     auto cpoint = ray.pointAt(d);
     return Collision(this, &ray, inside ? position - cpoint : cpoint - position, cpoint, d);
 }
+
+Collision Plain::interact(const Ray& ray) const {
+    float n_d = Vector3f::dot(normal, ray.direction);
+    float t = - (d + Vector3f::dot(normal, ray.from)) / n_d;
+    if (isnanf(t) || t <= 0) return Collision(&ray, false);
+    return Collision(this, &ray, n_d < 0 ? normal : -normal, ray.pointAt(t), t);
+}
+
+Collision Triangle::interact(const Ray& ray) const {
+    float n_d = Vector3f::dot(normal, ray.direction);
+    float t = - (d + Vector3f::dot(normal, ray.from)) / n_d;
+    if (isnanf(t) || t <= 0) return Collision(&ray, false);
+    auto cpoint = ray.pointAt(t);
+    auto fcpoint = flatten(cpoint);
+    Quadrant q[3];
+    for (int i = 0; i < 3; i++)
+        q[i] = getQuadrant(p[i] - fcpoint);
+    
+    return Collision(this, &ray, n_d < 0 ? normal : -normal, ray.pointAt(t), t);
+}

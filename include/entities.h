@@ -5,6 +5,8 @@
 #include "materials.h"
 #include "ray.h"
 
+#include <algorithm>
+#include <iostream>
 class BoundingBox {
 public:
     Vector3f min;
@@ -34,24 +36,63 @@ private:
 class Plain : public Entity {
 public:
     Plain(const Vector3f& normal_, float offset_, const Material* pMaterial_ = nullptr) : normal(normal_), offset(offset_), Entity(Vector3f() + offset_ * normal_, pMaterial_) {
-        origin = - Vector3f::dot(normal, position);
+        d = - Vector3f::dot(normal, position);
     }
     Collision interact(const Ray& ray) const override;
 private:
     Vector3f normal;
-    Vector3f origin;
+    float d;
     float offset;
 };
 
-// class Triangle : public Entity {
-// public:
-//     Triangle(const Vector3f& p1_, const Vector3f& p2_, const Vector3f& p3_, const Material* pMaterial_ = nullptr) :
-//         p1(p1_), p2(p2_), p3(p3_), Entity(p1_, pMaterial_), normal(Vector3f::cross(p2_ - p1_, p3_ - p1_).normalized()) {}
-//     Collision interact(const Ray& ray) const override;
-// private:
-//     Vector3f p1, p2, p3;
-//     Vector3f normal;
-// };
+class Triangle : public Entity {
+public:
+    Triangle(const Vector3f& p1_, const Vector3f& p2_, const Vector3f& p3_, const Material* pMaterial_ = nullptr) :
+        Entity(p1_, pMaterial_), normal(Vector3f::cross(p2_ - p1_, p3_ - p1_).normalized()) {
+            d = -Vector3f::dot(normal, position);
+            p[0] = p1_; p[1] = p2_; p[2] = p3_;
+            flattenMode = ILLIGAL;
+            if (std::abs(normal.z()) > 1e-4f) flattenMode = XY;
+            else if (std::abs(normal.y()) > 1e-4f) flattenMode = XZ;
+            else if (std::abs(normal.y()) > 1e-4f) flattenMode = YZ;
+            std::cout << flattenMode;
+            for (int i = 0; i < 3; i++) {
+                switch (flattenMode) {
+                    case ILLIGAL: return;
+                    case XY: f[i] = p[i].xy(); break;
+                    case XZ: f[i] = p[i].xz(); break;
+                    case YZ: f[i] = p[i].yz(); break;
+                }
+            }
+        }
+    Collision interact(const Ray& ray) const override;
+private:
+    enum FlattenMode {ILLIGAL, XY, XZ, YZ};
+    enum Quadrant {I, II, III, IV};
+    Vector3f p[3];
+    Vector3f normal;
+    Vector2f f[3];
+    FlattenMode flattenMode;
+    float d;
+    Vector2f flatten(const Vector3f& point) const {
+        switch (flattenMode) {
+            case ILLIGAL: return Vector2f();
+            case XY: return point.xy();
+            case XZ: return point.xz();
+            case YZ: return point.yz();
+        }
+    }
+    static Quadrant getQuadrant(const Vector2f& point) {
+        if (point.x() >= 0) {
+            if (point.y() >= 0) return I;
+            else return IV;
+        }
+        else {
+            if (point.y() >= 0) return II;
+            else return III;
+        }
+    }
+};
 
 // class Mesh : public Entity {
 // public:

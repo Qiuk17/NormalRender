@@ -1,5 +1,6 @@
 #include "scene.h"
 #include <iostream>
+#include <cassert>
 AbstractScene::~AbstractScene() {
 	for (auto p : vecEntity) delete p;
 	for (auto p : vecLight) delete p;
@@ -33,11 +34,10 @@ void RaycastScene::render(const char* finishArgv) {
 			auto color = Color();
 			for (int i = 0; i < countLight; i++) {
 				auto li = pLights[i]->castOnPoint(col.point);
-				if (Vector3f::dot(li.direction, col.normal) > 0 && !pDetector->getClosestCollision(Ray(col.point + li.direction * 1e-3, li.direction)).isValid)
+				if (Vector3f::dot(li.direction, col.normal) > 0 && !pDetector->isRayCollided(Ray(col.point + col.normal * 1e-4, li.direction), -1, li.distance + 1e-3)) {
 					color += col.pEntity->getMaterial()->getColor(col, *pLights[i]).restriction();
-				else color = Color(1, 0, 0);
+				}
 			}
-			
 			color.restricted();
 			pPresenter->setPixel(x, y, color);
 		}
