@@ -6,7 +6,7 @@
 
 Color LambertMaterial::getColor(const Collision& collision, const Light& light) const {
     auto interaction = light.castOnPoint(collision.point);
-    return ((color * interaction.color) * Vector3f::dot(collision.normal, interaction.direction) * (1 - absorption)).restriction();
+    return ((color * interaction.color) * Vector3f::dot(collision.normal, interaction.direction) * (1 - absorption) * ()).restriction();
 }
 
 Color PhongMaterial::getColor(const Collision& collision, const Light& light) const {

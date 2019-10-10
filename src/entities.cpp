@@ -27,9 +27,14 @@ Collision Triangle::interact(const Ray& ray) const {
     if (isnanf(t) || t <= 0) return Collision(&ray, false);
     auto cpoint = ray.pointAt(t);
     auto fcpoint = flatten(cpoint);
-    Quadrant q[3];
-    for (int i = 0; i < 3; i++)
-        q[i] = getQuadrant(p[i] - fcpoint);
-    
-    return Collision(this, &ray, n_d < 0 ? normal : -normal, ray.pointAt(t), t);
+    auto delta = 0;
+    for (int i = 0; i < 3; i++) {
+        try {
+            delta += getDeltaDegree(f[i] - fcpoint, f[(i + 1) % 3] - fcpoint);
+        } catch (int& e) {
+            delta = 2; break;
+        }
+    }
+    if (delta == 0) return Collision(&ray, false);
+    return Collision(this, &ray, n_d < 0 ? normal : -normal, cpoint, t);
 }

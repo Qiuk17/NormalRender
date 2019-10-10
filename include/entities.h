@@ -54,7 +54,7 @@ public:
             flattenMode = ILLIGAL;
             if (std::abs(normal.z()) > 1e-4f) flattenMode = XY;
             else if (std::abs(normal.y()) > 1e-4f) flattenMode = XZ;
-            else if (std::abs(normal.y()) > 1e-4f) flattenMode = YZ;
+            else if (std::abs(normal.x()) > 1e-4f) flattenMode = YZ;
             std::cout << flattenMode;
             for (int i = 0; i < 3; i++) {
                 switch (flattenMode) {
@@ -91,6 +91,18 @@ private:
             if (point.y() >= 0) return II;
             else return III;
         }
+    }
+    static int getDeltaDegree(const Vector2f& pointFrom, const Vector2f& pointTo) {
+        auto qFrom = getQuadrant(pointFrom), qTo = getQuadrant(pointTo);
+        auto delta = qTo - qFrom;
+        if (delta == 0) return 0;
+        if (delta == 1 || delta == -3) return 1;
+        if (delta == 2 || delta == -2)  {
+            auto d = pointTo.y() * pointFrom.x() - pointTo.x() * pointFrom.y();
+            if (d == 0) throw 0;
+            return d > 0 ? 2 : -2;
+        }
+        if (delta == 3 || delta == -1) return -1;
     }
 };
 

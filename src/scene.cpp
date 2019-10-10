@@ -37,6 +37,7 @@ void RaycastScene::render(const char* finishArgv) {
 				if (Vector3f::dot(li.direction, col.normal) > 0 && !pDetector->isRayCollided(Ray(col.point + col.normal * 1e-4, li.direction), -1, li.distance + 1e-3)) {
 					color += col.pEntity->getMaterial()->getColor(col, *pLights[i]).restriction();
 				}
+				//else if (pDetector->isRayCollided(Ray(col.point + col.normal * 1e-4, li.direction), -1, li.distance + 1e-3)) color = Color(1, 0, 0);
 			}
 			color.restricted();
 			pPresenter->setPixel(x, y, color);
