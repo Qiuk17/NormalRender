@@ -1,6 +1,8 @@
 #ifndef VECTOR_3F_H
 #define VECTOR_3F_H
 
+#include <iostream>
+
 class Vector2f;
 
 class Vector3f
@@ -64,6 +66,8 @@ public:
 	Vector3f& operator += ( const Vector3f& v );
 	Vector3f& operator -= ( const Vector3f& v );
     Vector3f& operator *= ( float f );
+
+	friend std::istream& operator >> (std::istream& is, Vector3f& vec);
 
     static float dot( const Vector3f& v0, const Vector3f& v1 );
 	static Vector3f cross( const Vector3f& v0, const Vector3f& v1 );

@@ -320,3 +320,7 @@ bool operator != ( const Vector3f& v0, const Vector3f& v1 )
 {
     return !( v0 == v1 );
 }
+
+std::istream& operator >> (std::istream& is, Vector3f& vec) {
+	is >> vec.m_elements[0] >> vec.m_elements[1] >> vec.m_elements[2];
+}

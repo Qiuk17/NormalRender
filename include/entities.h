@@ -7,6 +7,8 @@
 
 #include <algorithm>
 #include <iostream>
+#include <fstream>
+#include <vector>
 class BoundingBox {
 public:
     Vector3f min;
@@ -106,18 +108,52 @@ private:
     }
 };
 
-// class Mesh : public Entity {
-// public:
-//     Mesh(const char* objPath, const Vector3f& position_ = Vector3f(), const Material* pMaterial_ = nullptr) : Entity(position_, pMaterial_) {
-
-//     }
-//     ~Mesh() override {
-
-//     }
-// private:
-//     std::vector<Vector3f> vertexArray;
-//     std::vector<Triangle*> trianglePointerArray;
-// };
+class Mesh : public Entity {
+public:
+    Mesh(const char* objPath, const Vector3f& position_ = Vector3f(), const Material* pMaterial_ = nullptr) : Entity(position_, pMaterial_) {
+        std::ifstream objStream(objPath);
+        std::cout << objStream.flags();
+        if (!objStream.good())
+            std::__throw_ios_failure("[Warning] Failed to open mesh file. Ignoring.");
+        char flag;
+        std::vector<Vector3f*> vertexs;
+        std::vector<Triangle*> triangles;
+        Vector3f* vp; Triangle* tp;
+        int i1, i2, i3;
+        while (objStream >> flag) {
+            if (objStream.eof()) break;
+            switch (flag) {
+                case 'v': 
+                    vp = new Vector3f();
+                    objStream >> *vp;
+                    vertexs.emplace_back(vp);
+                    break;
+                case 'f': 
+                    objStream >> i1 >> i2 >> i3;
+                    tp = new Triangle(*vertexs[i1 - 1], *vertexs[i2 - 1], *vertexs[i3 - 1], pMaterial_);
+                    triangles.emplace_back(tp);
+                    break;
+                default: std::__throw_invalid_argument("Obj file is not valid.");
+            }
+        }
+        arrayVertexPtr = new Vector3f*[vertexs.size()];
+        arrayTrianglePtr = new Triangle*[triangles.size()];
+        for (auto p: vertexs) arrayVertexPtr[countVertex++] = p;
+        for (auto p: triangles) arrayTrianglePtr[countTriangle++] = p;
+        std::cout << countTriangle << " faces\n";
+    }
+    ~Mesh() override {
+        for (int i = 0; i < countVertex; i++) delete arrayVertexPtr[i];
+        for (int i = 0; i < countTriangle; i++) delete arrayTrianglePtr[i];
+        delete arrayVertexPtr; delete arrayTrianglePtr;
+    }
+    Collision interact(const Ray& ray) const override;
+private:
+    Vector3f**  arrayVertexPtr;
+    int countVertex = 0;
+    Triangle** arrayTrianglePtr;
+    int countTriangle = 0;
+};
 
 // class Transform : public Entity {
 

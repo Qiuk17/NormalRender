@@ -38,3 +38,14 @@ Collision Triangle::interact(const Ray& ray) const {
     if (delta == 0) return Collision(&ray, false);
     return Collision(this, &ray, n_d < 0 ? normal : -normal, cpoint, t);
 }
+
+Collision Mesh::interact(const Ray& ray) const {
+    Collision ans(&ray, false);
+    for (int i = 0; i < countTriangle; i++) {
+        auto c = arrayTrianglePtr[i]->interact(ray);
+        if (!c.isValid) continue;
+        if (!ans.isValid) {ans = c; continue;}
+        if (c.distance < ans.distance) {ans = c; continue;}
+    }
+    return ans;
+}
