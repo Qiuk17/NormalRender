@@ -2,10 +2,12 @@
 #define _ENTITIES_H
 
 #include "collision.h"
+#include "detector.h"
 #include "materials.h"
 #include "ray.h"
 
 #include <algorithm>
+#include <cstring>
 #include <iostream>
 #include <fstream>
 #include <vector>
@@ -20,11 +22,30 @@ public:
     Entity(const Vector3f& position_, const Material* pMaterial_ = nullptr) : position(position_), pMaterial(pMaterial_) {}
     virtual ~Entity() = default;
     virtual Collision interact(const Ray& ray) const = 0;
+    const Vector3f& getPosition() const {return position;}
     //virtual BoundingBox getBoundingBox() const = 0;
-    const Material* getMaterial() const { return pMaterial; }
+    virtual const Material* getMaterial() const { return pMaterial; }
 protected:
     Vector3f position;
     const Material* pMaterial;
+};
+
+class Group : public Entity {
+public:
+    Group(const std::vector<Entity*>& entities, Detector* detector = new BruteForceDetector()) : Entity(0, nullptr), pDetector(detector) {
+        for (auto i : entities) vecEntityPtr.emplace_back(i);
+        pDetector->prepareDetector(vecEntityPtr);
+    }
+    ~Group() {
+        for (auto i : vecEntityPtr) delete i;
+        delete pDetector;
+    }
+    Entity* getEntity(int index) { return vecEntityPtr[index]; }
+    Collision interact(const Ray& ray) const override;
+    const Detector* getDetector() const { return pDetector; }
+private:
+    std::vector<Entity*> vecEntityPtr;
+    Detector* pDetector;
 };
 
 class Sphere : public Entity {
@@ -35,9 +56,9 @@ private:
     float radius, radius_2;
 };
 
-class Plain : public Entity {
+class Plane : public Entity {
 public:
-    Plain(const Vector3f& normal_, float offset_, const Material* pMaterial_ = nullptr) : normal(normal_), offset(offset_), Entity(Vector3f() + offset_ * normal_, pMaterial_) {
+    Plane(const Vector3f& normal_, float offset_, const Material* pMaterial_ = nullptr) : normal(normal_), offset(offset_), Entity(Vector3f() + offset_ * normal_, pMaterial_) {
         d = - Vector3f::dot(normal, position);
     }
     Collision interact(const Ray& ray) const override;
@@ -57,7 +78,6 @@ public:
             if (std::abs(normal.z()) > 1e-4f) flattenMode = XY;
             else if (std::abs(normal.y()) > 1e-4f) flattenMode = XZ;
             else if (std::abs(normal.x()) > 1e-4f) flattenMode = YZ;
-            std::cout << flattenMode;
             for (int i = 0; i < 3; i++) {
                 switch (flattenMode) {
                     case ILLIGAL: return;
@@ -112,9 +132,11 @@ class Mesh : public Entity {
 public:
     Mesh(const char* objPath, const Vector3f& position_ = Vector3f(), const Material* pMaterial_ = nullptr) : Entity(position_, pMaterial_) {
         std::ifstream objStream(objPath);
-        std::cout << objStream.flags();
-        if (!objStream.good())
-            std::__throw_ios_failure("[Warning] Failed to open mesh file. Ignoring.");
+        if (!objStream.good()) {
+            char buf[400];
+            sprintf(buf, "[Warning] Failed to open \"%s\". Ignoring.", objPath);
+            std::__throw_ios_failure(buf);
+        }
         char flag;
         std::vector<Vector3f*> vertexs;
         std::vector<Triangle*> triangles;
@@ -126,6 +148,7 @@ public:
                 case 'v': 
                     vp = new Vector3f();
                     objStream >> *vp;
+                    *vp += position;
                     vertexs.emplace_back(vp);
                     break;
                 case 'f': 
@@ -140,7 +163,6 @@ public:
         arrayTrianglePtr = new Triangle*[triangles.size()];
         for (auto p: vertexs) arrayVertexPtr[countVertex++] = p;
         for (auto p: triangles) arrayTrianglePtr[countTriangle++] = p;
-        std::cout << countTriangle << " faces\n";
     }
     ~Mesh() override {
         for (int i = 0; i < countVertex; i++) delete arrayVertexPtr[i];
@@ -155,8 +177,23 @@ private:
     int countTriangle = 0;
 };
 
-// class Transform : public Entity {
+class Transform : public Entity {
+public:
+    Transform(Entity* pEntity_, const Matrix4f& transform_)
+        : pEntity(pEntity_),
+        transform(transform_.inverse()),
+        Entity(pEntity_->getPosition(), nullptr) {}
+    Collision interact(const Ray& ray) const override;
+private:
+    Entity* pEntity;
+    Matrix4f transform;
 
-// };
+    static Vector3f transformPoint(const Matrix4f &mat, const Vector3f &point) {
+        return (mat * Vector4f(point, 1)).xyz();
+    }
+    static Vector3f transformDirection(const Matrix4f &mat, const Vector3f &dir) {
+        return (mat * Vector4f(dir, 0)).xyz();
+    }
+};
 
 #endif

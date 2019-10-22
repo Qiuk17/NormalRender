@@ -2,6 +2,10 @@
 #include <iostream>
 #include "entities.h"
 
+Collision Group::interact(const Ray& ray) const {
+    return pDetector->getClosestCollision(ray);
+}
+
 Collision Sphere::interact(const Ray& ray) const {
     auto delta = position - ray.from;
     bool inside = delta.squaredLength() < radius_2;
@@ -14,7 +18,7 @@ Collision Sphere::interact(const Ray& ray) const {
     return Collision(this, &ray, inside ? position - cpoint : cpoint - position, cpoint, d);
 }
 
-Collision Plain::interact(const Ray& ray) const {
+Collision Plane::interact(const Ray& ray) const {
     float n_d = Vector3f::dot(normal, ray.direction);
     float t = - (d + Vector3f::dot(normal, ray.from)) / n_d;
     if (isnanf(t) || t <= 0) return Collision(&ray, false);
@@ -48,4 +52,10 @@ Collision Mesh::interact(const Ray& ray) const {
         if (c.distance < ans.distance) {ans = c; continue;}
     }
     return ans;
+}
+
+Collision Transform::interact(const Ray& ray) const {
+    auto col = pEntity->interact(Ray(transformPoint(transform, ray.from), transformDirection(transform, ray.direction)));
+    if (!col.isValid) return Collision(&ray, false);
+    return Collision(col.pEntity, &ray, transformDirection(transform.transposed(), col.normal).normalized(), ray.pointAt(col.distance), col.distance);
 }

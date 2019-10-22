@@ -23,9 +23,10 @@ SET(SOURCES
              src/camera.cpp
              src/presenter.cpp
              src/detector.cpp
+             src/parser.cpp
              src/main.cpp)
 
-SET(CMAKE_CXX_STANDARD 11)
+SET(CMAKE_CXX_STANDARD 17)
 SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
 
 ADD_EXECUTABLE(${PROJECT_NAME} ${SOURCES} ${INCLUDES})

@@ -4,9 +4,9 @@
 #include <vector>
 
 #include "ray.h"
-#include "entities.h"
 #include "collision.h"
 
+class Entity;
 class Detector {
 public:
     virtual ~Detector() {}

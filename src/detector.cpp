@@ -1,4 +1,5 @@
 #include "detector.h"
+#include "entities.h"
 
 bool Detector::isRayCollided(const Ray& ray, float largerThan, float smallerThan) const {
     return getAnyCollision(ray, largerThan, smallerThan).isValid;

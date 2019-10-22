@@ -2,10 +2,12 @@
 #define _COLOR_H
 
 #include <algorithm>
+#include <iostream>
 #include <cmath>
 #include <Vector3f.h>
 
 class Color {
+	friend std::istream& operator>> (std::istream& is, Color& color);
 public:
 	float r, g, b;
 	explicit Color (float gray = 0.0f) : r(gray), g(gray), b(gray) {restricted();}

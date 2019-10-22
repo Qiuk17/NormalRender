@@ -11,9 +11,9 @@ public:
     virtual Color getColor(const Collision& collision, const Light& light) const = 0;
 };
 
-class LambertMaterial : public Material {
+class DiffMaterial : public Material {
 public:
-    LambertMaterial(const Color& color_, float absorption_ = 0.0f) : color(color_), absorption(absorption_) {}
+    DiffMaterial(const Color& color_, float absorption_ = 0.0f) : color(color_), absorption(absorption_) {}
     Color getColor(const Collision& collision, const Light& light) const override;
 private:
     Color color;
