@@ -22,6 +22,7 @@ public:
     Entity(const Vector3f& position_, const Material* pMaterial_ = nullptr) : position(position_), pMaterial(pMaterial_) {}
     virtual ~Entity() = default;
     virtual Collision interact(const Ray& ray) const = 0;
+    virtual void glDraw() const { if (pMaterial) pMaterial->glApply(); };
     const Vector3f& getPosition() const {return position;}
     //virtual BoundingBox getBoundingBox() const = 0;
     virtual const Material* getMaterial() const { return pMaterial; }
@@ -42,6 +43,7 @@ public:
     }
     Entity* getEntity(int index) { return vecEntityPtr[index]; }
     Collision interact(const Ray& ray) const override;
+    void glDraw() const override;
     const Detector* getDetector() const { return pDetector; }
 private:
     std::vector<Entity*> vecEntityPtr;
@@ -52,6 +54,7 @@ class Sphere : public Entity {
 public:
     Sphere(const Vector3f& position_, float radius_, const Material* pMaterial_ = nullptr) : Entity(position_, pMaterial_), radius(radius_), radius_2(radius_ * radius_) {}
     Collision interact(const Ray& ray) const override;
+    void glDraw() const override;
 private:
     float radius, radius_2;
 };
@@ -62,6 +65,7 @@ public:
         d = - Vector3f::dot(normal, position);
     }
     Collision interact(const Ray& ray) const override;
+    void glDraw() const override;
 private:
     Vector3f normal;
     float d;
@@ -88,6 +92,7 @@ public:
             }
         }
     Collision interact(const Ray& ray) const override;
+    void glDraw() const override;
 private:
     enum FlattenMode {ILLIGAL, XY, XZ, YZ};
     enum Quadrant {I, II, III, IV};
@@ -170,6 +175,7 @@ public:
         delete arrayVertexPtr; delete arrayTrianglePtr;
     }
     Collision interact(const Ray& ray) const override;
+    void glDraw() const override;
 private:
     Vector3f**  arrayVertexPtr;
     int countVertex = 0;
@@ -184,6 +190,7 @@ public:
         transform(transform_.inverse()),
         Entity(pEntity_->getPosition(), nullptr) {}
     Collision interact(const Ray& ray) const override;
+    void glDraw() const override;
 private:
     Entity* pEntity;
     Matrix4f transform;
