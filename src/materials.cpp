@@ -18,11 +18,13 @@ Color PhongMaterial::getColor(const Collision& collision, const Light& light) co
 }
 
 void DiffMaterial::glApply() const {
-    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, Vector4f(color.toVec(), 1.0f));
+    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, Vector4f(color.toVec(), 1));
+    glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, Vector4f(0, 0, 0, 1));
+    glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, Vector2f(0, 1));
 }
 
 void PhongMaterial::glApply() const {
-    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, Vector4f(color.toVec(), 1.0f));
-    glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, Vector4f(specColor.toVec(), 1.0f));
-    glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, Vector2f(shininess * 4.0, 1.0f));
+    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, Vector4f(color.toVec(), 1));
+    glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, Vector4f(specColor.toVec(), 1));
+    glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, Vector2f(shininess * 4.0, 1));
 }
