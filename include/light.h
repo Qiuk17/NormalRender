@@ -19,6 +19,7 @@ class Light {
 public:
     Light(const Color& color_, float intensity_ = 1.0f) : color(color_), intensity(intensity_) {}
     virtual LightInteraction castOnPoint(const Vector3f& point) const = 0;
+    virtual void glTurnOn(int idx) const = 0;
 protected:
     Color color;
     float intensity;
@@ -29,6 +30,7 @@ public:
     PointLight(const Vector3f& position_, const Color& color_, float intensity_ = 1.0f) :
         position(position_), Light(color_, intensity_) {}
     LightInteraction castOnPoint(const Vector3f& point) const override;
+    void glTurnOn(int idx) const;
 private:
     Vector3f position;
 };
@@ -38,6 +40,7 @@ public:
     DirectionalLight(const Vector3f& direction_, const Color& color_, float intensity_ = 1.0f) :
         direction(direction_.normalized()), Light(color_, intensity_) {}
     LightInteraction castOnPoint(const Vector3f& point) const override;
+    void glTurnOn(int idx) const;
 private:
     Vector3f direction;
 };
