@@ -22,7 +22,7 @@ public:
 
     int getWidth() const { return width; }
     int getHeight() const { return height; }
-
+    virtual void glSetup() const;
 protected:
     // Extrinsic parameters
     Vector3f center;
@@ -39,12 +39,14 @@ public:
     PerspectiveCamera(const Vector3f &center, const Vector3f &direction,
             const Vector3f &up, int imgW, int imgH, float angle) : Camera(center, direction, up, imgW, imgH) {
         rotateMatrix = Matrix3f(horizontal, -up, direction);
+        fovyd = angle / M_PI * 180.0;
         cmosHalfHeight = tan(angle / 2); cmosHalfWidth = cmosHalfHeight * width / (float)height;
         pixelWidth = 2 * cmosHalfWidth / (float)imgW; pixelHeight = 2 * cmosHalfHeight / (float)imgH;
     }
     Ray generateRay(int x, int y) const override;
+    void glSetup() const override;
 private:
-    float cmosHalfWidth, cmosHalfHeight, pixelWidth, pixelHeight;
+    float cmosHalfWidth, cmosHalfHeight, pixelWidth, pixelHeight, fovyd;
     Matrix3f rotateMatrix;
 };
 

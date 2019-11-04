@@ -26,6 +26,7 @@ public:
 	Material* getMaterial(int index) const {return vecMaterial[index]; }
 	Entity* getEntity(int index) const { return pGroup->getEntity(index); }
 	Light* getLight(int index) const { return vecLight[index]; }
+	Camera* getCamera() { return pCamera; }
 protected:
     std::vector<Material*> vecMaterial;
     std::vector<Light*>    vecLight;
