@@ -9,6 +9,7 @@
 
 enum SCENE_TYPE {
     ST_RAYCAST,
+    ST_OPENGL,
     ST_RAYTRACE,
     ST_PHOTONMAPPING
 };
@@ -38,6 +39,7 @@ private:
         if (!stream.good()) std::__throw_ios_failure("[Error] Unable to open the scene file.");
         switch (type) {
             case ST_RAYCAST: pScene = new RaycastScene(); break;
+            case ST_OPENGL: pScene = new OpenGlScene(); break;
             case ST_RAYTRACE:
             case ST_PHOTONMAPPING: std::__throw_logic_error("[Error] Unimplemented Scene.");
             default: std::__throw_invalid_argument("[Error] Bad scene type.");

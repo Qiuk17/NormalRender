@@ -99,7 +99,7 @@ void Parser::parsePhongMaterial() {
     GET_PARAMETER(specularColor, Color);
     GET_PARAMETER(shininess, int);
     BRACE_END();
-    pScene->addMaterial(new PhongMaterial(diffuseColor, shininess));
+    pScene->addMaterial(new PhongMaterial(diffuseColor, specularColor, shininess));
 }
 
 void Parser::parseDiffMaterial() {

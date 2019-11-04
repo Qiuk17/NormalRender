@@ -16,7 +16,7 @@ public:
 	AbstractScene() = default;
 	virtual ~AbstractScene();
 	virtual void sceneComplete() = 0;
-    virtual void render(const char* finishArgv = nullptr) = 0;
+    virtual void render(int* argc, char** argv) = 0;
 	void addMaterial(Material* pMaterial) { vecMaterial.emplace_back(pMaterial); }
 	void addLight(Light* pLight) { vecLight.emplace_back(pLight); }
 	void setBackgroundColor(const Color& color) { background = color; }
@@ -40,10 +40,17 @@ class RaycastScene : public AbstractScene {
 public:
 	~RaycastScene() override;
 	void sceneComplete() override;
-	void render(const char* finishArgv = nullptr) override;
+	void render(int* argc, char** argv) override;
 private:
 	Light** pLights = nullptr;
 	int countLight = 0;
+};
+
+class OpenGlScene : public AbstractScene {
+public:
+	~OpenGlScene() override;
+	void sceneComplete() override;
+	void render(int* argc, char** argv) override;
 };
 
 #endif

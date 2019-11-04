@@ -43,7 +43,7 @@ void Plane::glDraw() const {
     Entity::glDraw();
     auto y = Vector3f::cross(normal, Vector3f::RIGHT);
     auto x = Vector3f::cross(y, normal);
-    auto o = d * normal;
+    auto o = -d * normal;
     const float size = 10.0f;
     x *= size, y *= size;
     glBegin(GL_TRIANGLES);
