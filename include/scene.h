@@ -53,4 +53,13 @@ public:
 	void render(int* argc, char** argv) override;
 };
 
+class RayTracingScene : public AbstractScene {
+public:
+	~RayTracingScene() override;
+	void sceneComplete() override;
+	void render(int* argc, char** argv) override;
+private:
+	
+};
+
 #endif
