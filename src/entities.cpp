@@ -114,3 +114,24 @@ void Transform::glDraw() const {
     pEntity->glDraw();
     glPopMatrix();
 }
+
+void Curve::glDraw() const {
+    glPushAttrib(GL_ALL_ATTRIB_BITS);
+    glDisable(GL_LIGHTING);
+    glColor3f(1, 1, 0);
+    glBegin(GL_LINE_STRIP);
+    for (auto & control : *pControls)
+        glVertex3fv(control);
+    glEnd();
+    glPointSize(4);
+    glBegin(GL_POINTS);
+    for (auto & control : *pControls)
+        glVertex3fv(control);
+    glEnd();
+    glColor3f(1, 1, 1);
+    glBegin(GL_LINE_STRIP);
+    for (int i = 0; i <= resolution; i++)
+        glVertex3fv(pSamplePoints[i]);
+    glEnd();
+    glPopAttrib();
+}

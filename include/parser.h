@@ -67,6 +67,8 @@ private:
     Triangle* parseTriangle(Material* material);
     Mesh* parseMesh(Material* material);
     Transform* parseTransform(Material* material);
+    Curve* parseBsplineCurve(Material* matetial);
+    Curve* parseBezierCurve(Material* material);
     bool getToken(std::string& token) {
         stream >> token;
         if (stream.eof()) return false;

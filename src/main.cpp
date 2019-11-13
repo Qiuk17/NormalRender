@@ -7,5 +7,4 @@ int main(int argc, char** argv) {
 	auto pScene = Parser::CreateSceneFromFile(argv[1], ST_OPENGL);
 	pScene->render(&argc, argv);
 	std::cout << "Image rendered to " << argv[2] << std::endl;
-	return 0;
 }

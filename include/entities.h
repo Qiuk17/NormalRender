@@ -10,6 +10,7 @@
 #include <cstring>
 #include <iostream>
 #include <fstream>
+#include <functional>
 #include <vector>
 class BoundingBox {
 public:
@@ -201,6 +202,56 @@ private:
     static Vector3f transformDirection(const Matrix4f &mat, const Vector3f &dir) {
         return (mat * Vector4f(dir, 0)).xyz();
     }
+};
+
+class Curve : public Entity {
+public:
+    Curve(std::vector<Vector3f>* pControls_, int resolution_, int k_, bool isBSpline_) : Entity(0, nullptr), pControls(pControls_), resolution(resolution_), isBSpline(isBSpline_), k(k_) {
+        n = pControls->size() - 1;
+        if (!isBSpline && k != n) std::__throw_logic_error("[Error] Invalid brezier curve.");
+        for (int i = 0; i <= n + k + 1; i++) knot[i] = i / (float)(n + k + 1);
+        pSamplePoints = new Vector3f[resolution + 1];
+        pSamplePointsNormal = new Vector3f[resolution + 1];
+        for (int sampleId = 0; sampleId <= resolution; sampleId++) {
+            float t = isBSpline ? knot[k] + (sampleId / (float)resolution) * knot[n - k + 1] : (sampleId / (float)resolution);
+            pSamplePoints[sampleId] = Vector3f(0);
+            pSamplePointsNormal[sampleId] = Vector3f(0);
+            Vector3f& point = pSamplePoints[sampleId];
+            Vector3f& normal = pSamplePointsNormal[sampleId];
+            for (int i = 0; i <= n; i++) point += pControls->at(i) * b(i, k, t);
+            for (int i = 0; i < n ; i++) normal += pControls->at(i) * (b(i - 1, k - 1, t) - b(i, k - 1, t));
+            normal.normalize();
+        }
+    }
+    ~Curve() override {
+        delete pControls;
+        delete pSamplePoints, pSamplePointsNormal;
+    }
+    Collision interact(const Ray& ray) const override { std::__throw_runtime_error("[Error] Curve cannot interact with ray."); }
+    void glDraw() const override;
+protected:
+    std::vector<Vector3f>* pControls = nullptr;
+    bool isBSpline;
+    int n, k;
+    float knot[200];
+    int resolution;
+    Vector3f* pSamplePoints = nullptr;
+    Vector3f* pSamplePointsNormal = nullptr;
+
+    float b(int i, int p, float t) {
+        if (!isBSpline) {
+            float cip = 1;
+            for (int m = i + 1; m <= p; m++) cip *= m;
+            for (int m = 2; m <= p - i; m++) cip /= m;
+            for (int m = 0; m < p - i; m++) cip *= 1 - t;
+            for (int m = 0; m < i; m++) cip *= t;
+            return cip;
+        }
+        if (p == 0) return t >= knot[i] && t < knot[i+1] ? 1.0f : 0.0f;
+        return (t - knot[i]) / knot[p] * b(i, p-1, t) +
+               (knot[i + p + 1] - t) / knot[p] * b(i+1, p-1, t);
+    }
+
 };
 
 #endif

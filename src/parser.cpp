@@ -148,6 +148,10 @@ Entity* Parser::parseEntity(const std::string& token, Material* currentMaterial)
             return parseMesh(currentMaterial);
         else if (token == "Transform")
             return parseTransform(currentMaterial);
+        else if (token == "BsplineCurve")
+            return parseBsplineCurve(currentMaterial);
+        else if (token == "BezierCurve")
+            return parseBezierCurve(currentMaterial);
         else
             THROW_SYNTAX_ERROR(__FILE__, __LINE__);
 }
@@ -236,4 +240,28 @@ Transform* Parser::parseTransform(Material* material) {
     }
     BRACE_END();
     return new Transform(entity, matrix);
+}
+
+Curve* Parser::parseBsplineCurve(Material* material) {
+    auto cps = new std::vector<Vector3f>();
+    BRACE_BEGIN();
+    GET_PARAMETER(controls, int);
+    for (int i = 0; i < controls; i++) {
+        GET(vec, Vector3f);
+        cps->emplace_back(vec);
+    }
+    BRACE_END();
+    return new Curve(cps, 30, 3, true);
+}
+
+Curve* Parser::parseBezierCurve(Material* material) {
+    auto cps = new std::vector<Vector3f>();
+    BRACE_BEGIN();
+    GET_PARAMETER(controls, int);
+    for (int i = 0; i < controls; i++) {
+        GET(vec, Vector3f);
+        cps->emplace_back(vec);
+    }
+    BRACE_END();
+    return new Curve(cps, 30, cps->size() - 1, false);
 }
