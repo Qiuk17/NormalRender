@@ -204,7 +204,9 @@ private:
     }
 };
 
+class RevCurveSurface;
 class Curve : public Entity {
+    friend class RevCurveSurface;
 public:
     Curve(std::vector<Vector3f>* pControls_, int resolution_, int k_, bool isBSpline_) : Entity(0, nullptr), pControls(pControls_), resolution(resolution_), isBSpline(isBSpline_), k(k_) {
         n = pControls->size() - 1;
@@ -219,7 +221,8 @@ public:
             Vector3f& point = pSamplePoints[sampleId];
             Vector3f& normal = pSamplePointsNormal[sampleId];
             for (int i = 0; i <= n; i++) point += pControls->at(i) * b(i, k, t);
-            for (int i = 0; i < n ; i++) normal += pControls->at(i) * (b(i - 1, k - 1, t) - b(i, k - 1, t));
+            for (int i = 0; i < n ; i++) normal += (pControls->at(i + 1) - pControls->at(i)) * b(i, k - 1, t);
+            normal = Vector3f(-normal.y(), normal.x(), 0);
             normal.normalize();
         }
     }
@@ -251,7 +254,42 @@ protected:
         return (t - knot[i]) / knot[p] * b(i, p-1, t) +
                (knot[i + p + 1] - t) / knot[p] * b(i+1, p-1, t);
     }
+};
 
+class RevCurveSurface : public Entity {
+public:
+    RevCurveSurface(Curve* pCurve_, Material* pMaterial_) : Entity(0, pMaterial_), pCurve(pCurve_) {
+        for (auto& p : *(pCurve->pControls))
+            if (p.z() != 0.0f) std::__throw_logic_error("[Error] For RevSurface, z must be 0.");
+        const int resolution = 40;
+        for(int ci = 0; ci <= pCurve->resolution; ci++) {
+            const auto& v = pCurve->pSamplePoints[ci];
+            const auto& n = pCurve->pSamplePointsNormal[ci];
+            for (int i = 0; i < resolution; i++) {
+                float t = i / (float)resolution;
+                Quat4f rot;
+                rot.setAxisAngle(t * 2 * M_PI, Vector3f::UP);
+                Vector3f pnew = Matrix3f::rotation(rot) * v;
+                Vector3f pNormal = Vector3f::cross(n, -Vector3f::FORWARD);
+                Vector3f nnew = Matrix3f::rotation(rot) * pNormal;
+                VV.emplace_back(pnew);
+                VN.emplace_back(nnew);
+                int i1 = (i + 1 == resolution) ? 0 : i + 1;
+                if (ci != pCurve->resolution) {
+                    VF.emplace_back((ci + 1) * resolution + i, ci * resolution + i1, ci * resolution + i);
+                    VF.emplace_back((ci + 1) * resolution + i, (ci + 1) * resolution + i1, ci * resolution + i1);
+                }
+            }
+        }
+    }
+    ~RevCurveSurface() { delete pCurve; }
+    Collision interact(const Ray& ray) const override { std::__throw_logic_error("[Error] RevSurface cannot interact with ray."); }
+    void glDraw() const override;
+private:
+    Curve* pCurve;
+    std::vector<Vector3f> VV;
+    std::vector<Vector3f> VN;
+    std::vector<std::tuple<unsigned, unsigned, unsigned>> VF;
 };
 
 #endif

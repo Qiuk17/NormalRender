@@ -135,3 +135,18 @@ void Curve::glDraw() const {
     glEnd();
     glPopAttrib();
 }
+
+void RevCurveSurface::glDraw() const {
+    Entity::glDraw();
+    glBegin(GL_TRIANGLES);
+        for (unsigned i = 0; i < VF.size(); i++) {
+            //glNormal3fv(Vector3f::cross(VV[std::get<0>(VF[i])] - VV[std::get<1>(VF[i])], VV[std::get<0>(VF[i])] - VV[std::get<2>(VF[i])]));
+            glNormal3fv(VN[std::get<0>(VF[i])]);
+            glVertex3fv(VV[std::get<0>(VF[i])]);
+            glNormal3fv(VN[std::get<1>(VF[i])]);
+            glVertex3fv(VV[std::get<1>(VF[i])]);
+            glNormal3fv(VN[std::get<2>(VF[i])]);
+            glVertex3fv(VV[std::get<2>(VF[i])]);
+        }
+        glEnd();
+}

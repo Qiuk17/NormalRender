@@ -69,6 +69,7 @@ private:
     Transform* parseTransform(Material* material);
     Curve* parseBsplineCurve(Material* matetial);
     Curve* parseBezierCurve(Material* material);
+    RevCurveSurface* parseRevCurveSurface(Material* material);
     bool getToken(std::string& token) {
         stream >> token;
         if (stream.eof()) return false;

@@ -152,6 +152,8 @@ Entity* Parser::parseEntity(const std::string& token, Material* currentMaterial)
             return parseBsplineCurve(currentMaterial);
         else if (token == "BezierCurve")
             return parseBezierCurve(currentMaterial);
+        else if (token == "RevSurface")
+            return parseRevCurveSurface(currentMaterial);
         else
             THROW_SYNTAX_ERROR(__FILE__, __LINE__);
 }
@@ -264,4 +266,13 @@ Curve* Parser::parseBezierCurve(Material* material) {
     }
     BRACE_END();
     return new Curve(cps, 30, cps->size() - 1, false);
+}
+
+RevCurveSurface* Parser::parseRevCurveSurface(Material* material) {
+    BRACE_BEGIN();
+    testToken("profile");
+    GET(curveName, std::string);
+    auto pc = dynamic_cast<Curve*>(parseEntity(curveName, material));
+    BRACE_END();
+    return new RevCurveSurface(pc, material);
 }
