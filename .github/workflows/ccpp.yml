@@ -17,6 +17,8 @@ jobs:
       run: ls
     - name: goto build
       run: cd build
+    - name: ls build
+      run: ls
     - name: cmake
       run: cmake ../
     - name: make
