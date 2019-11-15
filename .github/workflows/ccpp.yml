@@ -11,15 +11,7 @@ jobs:
     - uses: actions/checkout@v1
     - name: setup openGL
       run: sudo apt-get install mesa-common-dev freeglut3-dev
-    - name: build directory
-      run: mkdir build
-    - name: ls
-      run: ls
-    - name: goto build
-      run: cd build
-    - name: ls build
-      run: ls
     - name: cmake
-      run: cmake ../
+      run: cmake
     - name: make
       run: make
