@@ -12,6 +12,6 @@ jobs:
     - name: setup openGL
       run: sudo apt-get install mesa-common-dev freeglut3-dev
     - name: cmake
-      run: cmake
+      run: cmake ./
     - name: make
       run: make
