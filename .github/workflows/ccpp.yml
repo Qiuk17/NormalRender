@@ -13,6 +13,8 @@ jobs:
       run: sudo apt-get install mesa-common-dev freeglut3-dev
     - name: build directory
       run: mkdir build
+    - name: goto build
+      run: cd build
     - name: cmake
       run: cmake ../
     - name: make
