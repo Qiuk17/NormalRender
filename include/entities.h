@@ -217,12 +217,19 @@ public:
         for (int sampleId = 0; sampleId <= resolution; sampleId++) {
             float t = isBSpline ? knot[k] + (sampleId / (float)resolution) * knot[n - k + 1] : (sampleId / (float)resolution);
             pSamplePoints[sampleId] = Vector3f(0);
-            pSamplePointsNormal[sampleId] = Vector3f(0);
             Vector3f& point = pSamplePoints[sampleId];
             Vector3f& normal = pSamplePointsNormal[sampleId];
-            for (int i = 0; i <= n; i++) point += pControls->at(i) * b(i, k, t);
-            for (int i = 0; i < n ; i++) normal += (pControls->at(i + 1) - pControls->at(i)) * b(i, k - 1, t);
-            normal = Vector3f(-normal.y(), normal.x(), 0);
+            Vector3f before(0), after(0);
+            float eps = 1e-4;
+            for (int i = 0; i <= n; i++) {
+                auto& p = pControls->at(i);
+                point += p * b(i, k, t);
+                before += p * b(i, k, t - eps);
+                after += p * b(i, k, t + eps);
+            }
+            normal = (after - before);
+            //for (int i = 0; i < n ; i++) normal += (pControls->at(i + 1) - pControls->at(i)) * b(i, k - 1, t);
+            //normal = Vector3f(-normal.y(), normal.x(), 0);
             normal.normalize();
         }
     }
