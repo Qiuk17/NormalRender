@@ -10,7 +10,7 @@ jobs:
     steps:
     - uses: actions/checkout@v1
     - name: setup openGL
-      run: sudo apt-get install mesa-common-dev freeglut-dev
+      run: sudo apt-get install mesa-common-dev freeglut3-dev
     - name: build directory
       run: mkdir build
     - name: cmake
