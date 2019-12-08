@@ -53,7 +53,12 @@ private:
 
 class Sphere : public Entity {
 public:
-    Sphere(const Vector3f& position_, float radius_, const Material* pMaterial_ = nullptr) : Entity(position_, pMaterial_), radius(radius_), radius_2(radius_ * radius_) {}
+    Sphere(const Vector3f& position_
+         , float radius_
+         , const Material* pMaterial_ = nullptr) 
+         : Entity(position_, pMaterial_)
+         , radius(radius_)
+         , radius_2(radius_ * radius_) {}
     Collision interact(const Ray& ray) const override;
     void glDraw() const override;
 private:
@@ -62,7 +67,12 @@ private:
 
 class Plane : public Entity {
 public:
-    Plane(const Vector3f& normal_, float offset_, const Material* pMaterial_ = nullptr) : normal(normal_), offset(offset_), Entity(Vector3f() + offset_ * normal_, pMaterial_) {
+    Plane(const Vector3f& normal_
+        , float offset_
+        , const Material* pMaterial_ = nullptr) 
+        : normal(normal_)
+        , offset(offset_)
+        , Entity(Vector3f() + offset_ * normal_, pMaterial_) {
         d = - Vector3f::dot(normal, position);
     }
     Collision interact(const Ray& ray) const override;
@@ -75,8 +85,12 @@ private:
 
 class Triangle : public Entity {
 public:
-    Triangle(const Vector3f& p1_, const Vector3f& p2_, const Vector3f& p3_, const Material* pMaterial_ = nullptr) :
-        Entity(p1_, pMaterial_), normal(Vector3f::cross(p2_ - p1_, p3_ - p1_).normalized()) {
+    Triangle(const Vector3f& p1_
+           , const Vector3f& p2_
+           , const Vector3f& p3_
+           , const Material* pMaterial_ = nullptr) 
+           : Entity(p1_, pMaterial_)
+           , normal(Vector3f::cross(p2_ - p1_, p3_ - p1_).normalized()) {
             d = -Vector3f::dot(normal, position);
             p[0] = p1_; p[1] = p2_; p[2] = p3_;
             flattenMode = ILLIGAL;
@@ -136,7 +150,10 @@ private:
 
 class Mesh : public Entity {
 public:
-    Mesh(const char* objPath, const Vector3f& position_ = Vector3f(), const Material* pMaterial_ = nullptr) : Entity(position_, pMaterial_) {
+    Mesh(const char* objPath
+       , const Vector3f& position_ = Vector3f()
+       , const Material* pMaterial_ = nullptr) 
+       : Entity(position_, pMaterial_) {
         std::ifstream objStream(objPath);
         if (!objStream.good()) {
             char buf[400];
@@ -208,7 +225,15 @@ class RevCurveSurface;
 class Curve : public Entity {
     friend class RevCurveSurface;
 public:
-    Curve(std::vector<Vector3f>* pControls_, int resolution_, int k_, bool isBSpline_) : Entity(0, nullptr), pControls(pControls_), resolution(resolution_), isBSpline(isBSpline_), k(k_) {
+    Curve(std::vector<Vector3f>* pControls_
+        , int resolution_
+        , int k_
+        , bool isBSpline_) 
+        : Entity(0, nullptr)
+        , pControls(pControls_)
+        , resolution(resolution_)
+        , isBSpline(isBSpline_)
+        , k(k_) {
         n = pControls->size() - 1;
         if (!isBSpline && k != n) std::__throw_logic_error("[Error] Invalid brezier curve.");
         for (int i = 0; i <= n + k + 1; i++) knot[i] = i / (float)(n + k + 1);
@@ -265,7 +290,10 @@ protected:
 
 class RevCurveSurface : public Entity {
 public:
-    RevCurveSurface(Curve* pCurve_, Material* pMaterial_) : Entity(0, pMaterial_), pCurve(pCurve_) {
+    RevCurveSurface(Curve* pCurve_
+                  , Material* pMaterial_)
+                  : Entity(0, pMaterial_)
+                  , pCurve(pCurve_) {
         for (auto& p : *(pCurve->pControls))
             if (p.z() != 0.0f) std::__throw_logic_error("[Error] For RevSurface, z must be 0.");
         const int resolution = 40;
@@ -297,6 +325,28 @@ private:
     std::vector<Vector3f> VV;
     std::vector<Vector3f> VN;
     std::vector<std::tuple<unsigned, unsigned, unsigned>> VF;
+};
+
+class FfdMesh : public Mesh {
+public:
+    FfdMesh(const char* objPath
+          , unsigned int resX, unsigned int resY, unsigned resZ
+          , const Vector3f& position_ = Vector3f()
+          , const Material* pMaterial_ = nullptr)
+          : Mesh (objPath, position_, pMaterial_)
+          , resX(resX), resY(resY), resZ(resZ) {
+        
+          }
+
+    void edit(const std::vector<Vector3f>& controls) {
+        
+    }
+    Collision interact(const Ray& ray) const override;
+    void glDraw() const override;
+
+private:
+    unsigned int resX, resY, resZ;
+    Vector3f* arrayControls;
 };
 
 #endif
