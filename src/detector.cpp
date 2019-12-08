@@ -20,13 +20,13 @@ Collision BruteForceDetector::getClosestCollision(const Ray& ray) const {
         if (!res.isValid) {res = n; continue;}
         res = res.distance > n.distance ? n : res;
     }
-    return res;
+    return std::move(res);
 }
 
 Collision BruteForceDetector::getAnyCollision(const Ray& ray, float largerThan, float smallerThan) const {
     for (int i = 0; i < countEntity; i++) {
         auto n = pEntities[i]->interact(ray);
-        if (n.isValid && n.distance > largerThan && n.distance < smallerThan) return n;
+        if (n.isValid && n.distance > largerThan && n.distance < smallerThan) return std::move(n);
     }
-    return Collision(&ray, false);
+    return std::move(Collision(&ray, false));
 }

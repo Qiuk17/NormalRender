@@ -4,7 +4,7 @@
 #include "entities.h"
 
 Collision Group::interact(const Ray& ray) const {
-    return pDetector->getClosestCollision(ray);
+    return std::move(pDetector->getClosestCollision(ray));
 }
 
 void Group::glDraw() const {
@@ -15,12 +15,12 @@ Collision Sphere::interact(const Ray& ray) const {
     auto delta = position - ray.from;
     bool inside = delta.squaredLength() < radius_2;
     float D = Vector3f::dot(delta, ray.direction);
-    if (!inside && D <= 0) return Collision(&ray, false);
+    if (!inside && D <= 0) return std::move(Collision(&ray, false));
     float h_2 = delta.squaredLength() - D * D;
-    if (h_2 > radius_2) return Collision(&ray, false);
+    if (h_2 > radius_2) return std::move(Collision(&ray, false));
     float d = inside ? D + sqrt(radius_2 - h_2) : D - sqrt(radius_2 - h_2);
     auto cpoint = ray.pointAt(d);
-    return Collision(this, &ray, inside ? position - cpoint : cpoint - position, cpoint, d);
+    return std::move(Collision(this, &ray, inside ? position - cpoint : cpoint - position, cpoint, d));
 }
 
 void Sphere::glDraw() const {
@@ -35,8 +35,8 @@ void Sphere::glDraw() const {
 Collision Plane::interact(const Ray& ray) const {
     float n_d = Vector3f::dot(normal, ray.direction);
     float t = - (d + Vector3f::dot(normal, ray.from)) / n_d;
-    if (isnanf(t) || t <= 0) return Collision(&ray, false);
-    return Collision(this, &ray, n_d < 0 ? normal : -normal, ray.pointAt(t), t);
+    if (isnanf(t) || t <= 0) return std::move(Collision(&ray, false));
+    return std::move(Collision(this, &ray, n_d < 0 ? normal : -normal, ray.pointAt(t), t));
 }
 
 void Plane::glDraw() const {
@@ -61,7 +61,7 @@ void Plane::glDraw() const {
 Collision Triangle::interact(const Ray& ray) const {
     float n_d = Vector3f::dot(normal, ray.direction);
     float t = - (d + Vector3f::dot(normal, ray.from)) / n_d;
-    if (isnanf(t) || t <= 0) return Collision(&ray, false);
+    if (isnanf(t) || t <= 0) return std::move(Collision(&ray, false));
     auto cpoint = ray.pointAt(t);
     auto fcpoint = flatten(cpoint);
     auto delta = 0;
@@ -72,8 +72,8 @@ Collision Triangle::interact(const Ray& ray) const {
             delta = 2; break;
         }
     }
-    if (delta == 0) return Collision(&ray, false);
-    return Collision(this, &ray, n_d < 0 ? normal : -normal, cpoint, t);
+    if (delta == 0) return std::move(Collision(&ray, false));
+    return std::move(Collision(this, &ray, n_d < 0 ? normal : -normal, cpoint, t));
 }
 
 void Triangle::glDraw() const {
@@ -102,8 +102,8 @@ void Mesh::glDraw() const {
 
 Collision Transform::interact(const Ray& ray) const {
     auto col = pEntity->interact(Ray(transformPoint(transform, ray.from), transformDirection(transform, ray.direction)));
-    if (!col.isValid) return Collision(&ray, false);
-    return Collision(col.pEntity, &ray, transformDirection(transform.transposed(), col.normal).normalized(), ray.pointAt(col.distance), col.distance);
+    if (!col.isValid) return std::move(Collision(&ray, false));
+    return std::move(Collision(col.pEntity, &ray, transformDirection(transform.transposed(), col.normal).normalized(), ray.pointAt(col.distance), col.distance));
 }
 
 void Transform::glDraw() const {
