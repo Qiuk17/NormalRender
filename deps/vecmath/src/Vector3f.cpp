@@ -13,6 +13,9 @@
 const Vector3f Vector3f::ZERO = Vector3f( 0, 0, 0 );
 
 // static
+const Vector3f Vector3f::INF = Vector3f(1e20, 1e20, 1e20);
+
+// static
 const Vector3f Vector3f::UP = Vector3f( 0, 1, 0 );
 
 // static
@@ -178,6 +181,18 @@ Vector2f Vector3f::homogenized() const
 			m_elements[ 0 ] / m_elements[ 2 ],
 			m_elements[ 1 ] / m_elements[ 2 ]
 		);
+}
+
+void Vector3f::extendMin(const Vector3f& other) {
+    m_elements[0] = std::fmin(m_elements[0], other.m_elements[0]);
+    m_elements[1] = std::fmin(m_elements[1], other.m_elements[1]);
+    m_elements[2] = std::fmin(m_elements[2], other.m_elements[2]);
+}
+
+void Vector3f::extendMax(const Vector3f& other) {
+    m_elements[0] = std::fmax(m_elements[0], other.m_elements[0]);
+    m_elements[1] = std::fmax(m_elements[1], other.m_elements[1]);
+    m_elements[2] = std::fmax(m_elements[2], other.m_elements[2]);
 }
 
 void Vector3f::negate()

@@ -194,7 +194,7 @@ public:
     }
     Collision interact(const Ray& ray) const override;
     void glDraw() const override;
-private:
+protected:
     Vector3f**  arrayVertexPtr;
     int countVertex = 0;
     Triangle** arrayTrianglePtr;
@@ -335,7 +335,22 @@ public:
           , const Material* pMaterial_ = nullptr)
           : Mesh (objPath, position_, pMaterial_)
           , resX(resX), resY(resY), resZ(resZ) {
-        
+              auto boundingBoxMin = -Vector3f::INF;
+              auto boundingBoxMax =  Vector3f::INF;
+              for (int i = 0; i < countVertex; i++) {
+                  boundingBoxMax.extendMax(*arrayVertexPtr[i]);
+                  boundingBoxMin.extendMin(*arrayVertexPtr[i]);
+              }
+              auto dim = boundingBoxMax - boundingBoxMin;
+              arrayControls = new Vector3f[(resX + 1) * (resY + 1) * (resZ + 1)];
+              for (int x = 0; x <= resX; x++)
+                for (int y = 0; y <= resY; y++)
+                    for (int z = 0; z <= resZ; z++) {
+                        arrayControls[x * resY * resZ + y * resZ + z] = 
+                            Vector3f(boundingBoxMin.x() + dim.x() * x / resX
+                                   , boundingBoxMin.y() + dim.y() * y / resY
+                                   , boundingBoxMin.z() + dim.z() * z / resZ);
+                    }
           }
 
     void edit(const std::vector<Vector3f>& controls) {

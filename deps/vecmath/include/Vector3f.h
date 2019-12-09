@@ -10,6 +10,7 @@ class Vector3f
 public:
 
 	static const Vector3f ZERO;
+	static const Vector3f INF;
 	static const Vector3f UP;
 	static const Vector3f RIGHT;
 	static const Vector3f FORWARD;
@@ -62,6 +63,9 @@ public:
     operator const float* () const; // automatic type conversion for OpenGL
     operator float* (); // automatic type conversion for OpenGL 
 	void print() const;	
+
+	void Vector3f::extendMin(const Vector3f& other);
+	void Vector3f::extendMax(const Vector3f& other);
 
 	Vector3f& operator += ( const Vector3f& v );
 	Vector3f& operator -= ( const Vector3f& v );
