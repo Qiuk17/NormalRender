@@ -64,8 +64,8 @@ public:
     operator float* (); // automatic type conversion for OpenGL 
 	void print() const;	
 
-	void Vector3f::extendMin(const Vector3f& other);
-	void Vector3f::extendMax(const Vector3f& other);
+	void extendMin(const Vector3f& other);
+	void extendMax(const Vector3f& other);
 
 	Vector3f& operator += ( const Vector3f& v );
 	Vector3f& operator -= ( const Vector3f& v );
