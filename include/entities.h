@@ -343,6 +343,7 @@ public:
               }
               auto dim = boundingBoxMax - boundingBoxMin;
               arrayControls = new Vector3f[(resX + 1) * (resY + 1) * (resZ + 1)];
+              arrayParas = new Vector3f[countVertex];
               for (int x = 0; x <= resX; x++)
                 for (int y = 0; y <= resY; y++)
                     for (int z = 0; z <= resZ; z++) {
@@ -351,6 +352,12 @@ public:
                                    , boundingBoxMin.y() + dim.y() * y / resY
                                    , boundingBoxMin.z() + dim.z() * z / resZ);
                     }
+              for (int i = 0; i < countVertex; i++) {
+                  const auto& v = *arrayVertexPtr[i];
+                  arrayParas[i] = Vector3f((v.x() - boundingBoxMin.x()) / dim.x()
+                                         , (v.y() - boundingBoxMin.y()) / dim.y()
+                                         , (v.z() - boundingBoxMin.z()) / dim.z());
+              }
           }
 
     void edit(const std::vector<Vector3f>& controls) {
@@ -362,6 +369,17 @@ public:
 private:
     unsigned int resX, resY, resZ;
     Vector3f* arrayControls;
+    Vector3f* arrayParas;
+
+    static float base(int i, int p, float t) {
+        float cip = 0;
+        for (int m = i + 1; m <= p; m++) cip *= m;
+        for (int m = 2; m <= p - i; m++) cip /= m;
+        for (int m = 0; m < p - i; m++) cip *= 1 - t;
+        for (int m = 0; m < i; m++) cip *= t;
+        return cip;
+    }
+
 };
 
 #endif
