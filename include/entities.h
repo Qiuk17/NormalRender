@@ -343,19 +343,19 @@ public:
           : Mesh (objPath, position_, pMaterial_)
           , resX(resX), resY(resY), resZ(resZ)
           , countControls((resX + 1) * (resY + 1) * (resZ + 1)) {
-              auto boundingBoxMin = -Vector3f::INF;
-              auto boundingBoxMax =  Vector3f::INF;
+              auto boundingBoxMin =  Vector3f::INF;
+              auto boundingBoxMax = -Vector3f::INF;
               for (int i = 0; i < countVertex; i++) {
                   boundingBoxMax.extendMax(*arrayVertexPtr[i]);
                   boundingBoxMin.extendMin(*arrayVertexPtr[i]);
               }
               auto dim = boundingBoxMax - boundingBoxMin;
-              arrayControls = new Vector3f[(resX + 1) * (resY + 1) * (resZ + 1)];
+              arrayControls = new Vector3f[countControls];
               arrayParas = new Vector3f[countVertex];
               for (int x = 0; x <= resX; x++)
                 for (int y = 0; y <= resY; y++)
                     for (int z = 0; z <= resZ; z++) {
-                        arrayControls[x * resY * resZ + y * resZ + z] = 
+                        arrayControls[x * (resY + 1) * (resZ + 1) + y * (resZ + 1) + z] = 
                             Vector3f(boundingBoxMin.x() + dim.x() * x / resX
                                    , boundingBoxMin.y() + dim.y() * y / resY
                                    , boundingBoxMin.z() + dim.z() * z / resZ);
@@ -380,7 +380,7 @@ public:
             for (int x = 0; x <= resX; x++)
                 for (int y = 0; y <= resY; y++)
                     for (int z = 0; z <= resZ; z++) {
-                        v += arrayControls[x * resY * resZ + y * resZ + z] * base(x, resX, parameter.x()) * base(y, resY, parameter.y()) * base(z, resZ, parameter.z());
+                        v += arrayControls[x * (resY + 1) * (resZ + 1) + y * (resZ + 1) + z] * base(x, resX, parameter.x()) * base(y, resY, parameter.y()) * base(z, resZ, parameter.z());
                     }
         }
         for (int i = 0; i < countTriangle; i++) {
@@ -397,7 +397,7 @@ private:
     Vector3f* arrayParas;
 
     static float base(int i, int p, float t) {
-        float cip = 0;
+        float cip = 1;
         for (int m = i + 1; m <= p; m++) cip *= m;
         for (int m = 2; m <= p - i; m++) cip /= m;
         for (int m = 0; m < p - i; m++) cip *= 1 - t;

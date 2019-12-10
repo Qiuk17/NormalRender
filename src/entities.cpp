@@ -152,18 +152,15 @@ void RevCurveSurface::glDraw() const {
 }
 
 void FfdMesh::glDraw() const {
+    Entity::glDraw();
     Mesh::glDraw();
     glPushAttrib(GL_ALL_ATTRIB_BITS);
     glDisable(GL_LIGHTING);
     glPointSize(5.0);
     glBegin(GL_POINTS);
     glColor3d(1.0, 1.0, 1.0);
-    for (int x = 0; x <= resX; ++x) {
-        for (int y = 0; y <= resY; ++y) {
-            for (int z = 0; z <= resZ; ++z) {
-                glVertex3fv(arrayControls[x * resY * resZ + y * resZ + z]);
-            }
-        }
+    for (int x = 0; x < countControls; ++x) {
+        glVertex3fv(arrayControls[x]);
     }
     glEnd();
     glBegin(GL_LINES);
@@ -172,16 +169,16 @@ void FfdMesh::glDraw() const {
             for (int y = 0; y <= resY; ++y) {
                 for (int z = 0; z <= resZ; ++z) {
                     if (x != resX) {
-                        glVertex3fv(arrayControls[x * resY * resZ + y * resZ + z]);
-                        glVertex3fv(arrayControls[(x + 1) * resY * resZ + y * resZ + z]);
+                        glVertex3fv(arrayControls[x * (resY + 1) * (resZ + 1) + y * (resZ + 1) + z]);
+                        glVertex3fv(arrayControls[(x + 1) * (resY + 1) * (resZ + 1) + y * (resZ + 1) + z]);
                     }
                     if (y != resY) {
-                        glVertex3fv(arrayControls[x * resY * resZ + y * resZ + z]);
-                        glVertex3fv(arrayControls[x * resY * resZ + (y + 1) * resZ + z]);
+                        glVertex3fv(arrayControls[x * (resY + 1) * (resZ + 1) + y * (resZ + 1) + z]);
+                        glVertex3fv(arrayControls[x * (resY + 1) * (resZ + 1) + (y + 1) * (resZ + 1) + z]);
                     }
                     if (z != resZ) {
-                        glVertex3fv(arrayControls[x * resY * resZ + y * resZ + z]);
-                        glVertex3fv(arrayControls[x * resY * resZ + y * resZ + z + 1]);
+                        glVertex3fv(arrayControls[x * (resY + 1) * (resZ + 1) + y * (resZ + 1) + z]);
+                        glVertex3fv(arrayControls[x * (resY + 1) * (resZ + 1) + y * (resZ + 1) + z + 1]);
                     }
                 }
             }
