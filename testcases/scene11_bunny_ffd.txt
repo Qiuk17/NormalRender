@@ -42,7 +42,7 @@ Group {
         geometry TriangleMesh {
              obj_file mesh/bunny_1k.obj
         }
-        controls {}
+        no_controls
     }
 }
 
