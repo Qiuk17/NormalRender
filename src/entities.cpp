@@ -150,3 +150,42 @@ void RevCurveSurface::glDraw() const {
         }
         glEnd();
 }
+
+void FfdMesh::glDraw() const {
+    Mesh::glDraw();
+    glPushAttrib(GL_ALL_ATTRIB_BITS);
+    glDisable(GL_LIGHTING);
+    glPointSize(5.0);
+    glBegin(GL_POINTS);
+    glColor3d(1.0, 1.0, 1.0);
+    for (int x = 0; x <= resX; ++x) {
+        for (int y = 0; y <= resY; ++y) {
+            for (int z = 0; z <= resZ; ++z) {
+                glVertex3fv(arrayControls[x * resY * resZ + y * resZ + z]);
+            }
+        }
+    }
+    glEnd();
+    glBegin(GL_LINES);
+        glColor3d(1.0, 1.0, 1.0);
+        for (int x = 0; x <= resX; ++x) {
+            for (int y = 0; y <= resY; ++y) {
+                for (int z = 0; z <= resZ; ++z) {
+                    if (x != resX) {
+                        glVertex3fv(arrayControls[x * resY * resZ + y * resZ + z]);
+                        glVertex3fv(arrayControls[(x + 1) * resY * resZ + y * resZ + z]);
+                    }
+                    if (y != resY) {
+                        glVertex3fv(arrayControls[x * resY * resZ + y * resZ + z]);
+                        glVertex3fv(arrayControls[x * resY * resZ + (y + 1) * resZ + z]);
+                    }
+                    if (z != resZ) {
+                        glVertex3fv(arrayControls[x * resY * resZ + y * resZ + z]);
+                        glVertex3fv(arrayControls[x * resY * resZ + y * resZ + z + 1]);
+                    }
+                }
+            }
+        }
+        glEnd();
+        glPopAttrib();
+}

@@ -163,7 +163,8 @@ public:
         char flag;
         std::vector<Vector3f*> vertexs;
         std::vector<Triangle*> triangles;
-        Vector3f* vp; Triangle* tp;
+        std::vector<std::tuple<int, int, int>*> ids;
+        Vector3f* vp; Triangle* tp; std::tuple<int, int, int>* ip;
         int i1, i2, i3;
         while (objStream >> flag) {
             if (objStream.eof()) break;
@@ -177,20 +178,25 @@ public:
                 case 'f': 
                     objStream >> i1 >> i2 >> i3;
                     tp = new Triangle(*vertexs[i1 - 1], *vertexs[i2 - 1], *vertexs[i3 - 1], pMaterial_);
+                    ip = new std::tuple<int, int, int>(i1 - 1, i2 - 1, i3 - 1);
                     triangles.emplace_back(tp);
+                    ids.emplace_back(ip);
                     break;
                 default: std::__throw_invalid_argument("Obj file is not valid.");
             }
         }
         arrayVertexPtr = new Vector3f*[vertexs.size()];
         arrayTrianglePtr = new Triangle*[triangles.size()];
+        arrayTriangleIdPtr = new std::tuple<int, int, int>*[ids.size()];
         for (auto p: vertexs) arrayVertexPtr[countVertex++] = p;
         for (auto p: triangles) arrayTrianglePtr[countTriangle++] = p;
+        countTriangle = 0;
+        for (auto p: ids) arrayTriangleIdPtr[countTriangle++] = p;
     }
     ~Mesh() override {
         for (int i = 0; i < countVertex; i++) delete arrayVertexPtr[i];
-        for (int i = 0; i < countTriangle; i++) delete arrayTrianglePtr[i];
-        delete arrayVertexPtr; delete arrayTrianglePtr;
+        for (int i = 0; i < countTriangle; i++) delete arrayTrianglePtr[i], arrayTriangleIdPtr[i];
+        delete arrayVertexPtr; delete arrayTrianglePtr; delete arrayTriangleIdPtr;
     }
     Collision interact(const Ray& ray) const override;
     void glDraw() const override;
@@ -198,6 +204,7 @@ protected:
     Vector3f**  arrayVertexPtr;
     int countVertex = 0;
     Triangle** arrayTrianglePtr;
+    std::tuple<int, int, int>** arrayTriangleIdPtr;
     int countTriangle = 0;
 };
 
@@ -334,7 +341,8 @@ public:
           , const Vector3f& position_ = Vector3f()
           , const Material* pMaterial_ = nullptr)
           : Mesh (objPath, position_, pMaterial_)
-          , resX(resX), resY(resY), resZ(resZ) {
+          , resX(resX), resY(resY), resZ(resZ)
+          , countControls((resX + 1) * (resY + 1) * (resZ + 1)) {
               auto boundingBoxMin = -Vector3f::INF;
               auto boundingBoxMax =  Vector3f::INF;
               for (int i = 0; i < countVertex; i++) {
@@ -360,14 +368,31 @@ public:
               }
           }
 
-    void edit(const std::vector<Vector3f>& controls) {
-        
+    ~FfdMesh() {
+        delete arrayControls, arrayParas;
     }
-    Collision interact(const Ray& ray) const override;
+
+    void edit(const std::vector<Vector3f>& controls) {
+        for (int i = 0; i < countControls; i++) arrayControls[i] = controls[i];
+        for (int i = 0; i < countVertex; i++) {
+            auto& v = *arrayVertexPtr[i], &parameter = arrayParas[i];
+            v = Vector3f(0, 0, 0);
+            for (int x = 0; x <= resX; x++)
+                for (int y = 0; y <= resY; y++)
+                    for (int z = 0; z <= resZ; z++) {
+                        v += arrayControls[x * resY * resZ + y * resZ + z] * base(x, resX, parameter.x()) * base(y, resY, parameter.y()) * base(z, resZ, parameter.z());
+                    }
+        }
+        for (int i = 0; i < countTriangle; i++) {
+            auto& triangle = *arrayTrianglePtr[i];
+            auto& id = *arrayTriangleIdPtr[i];
+            triangle = Triangle(*arrayVertexPtr[std::get<0>(id)], *arrayVertexPtr[std::get<1>(id)], *arrayVertexPtr[std::get<2>(id)]);
+        }
+    }
     void glDraw() const override;
 
 private:
-    unsigned int resX, resY, resZ;
+    unsigned int resX, resY, resZ, countControls;
     Vector3f* arrayControls;
     Vector3f* arrayParas;
 
