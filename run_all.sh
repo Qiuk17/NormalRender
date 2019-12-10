@@ -18,6 +18,6 @@ cd ..
 mkdir -p output
 for i in $(ls testcases)
 do
-	bin/PA2 $(echo testcases/$i output/$i.bmp)
+	bin/PA4 $(echo testcases/$i output/$i.bmp)
 done
 
