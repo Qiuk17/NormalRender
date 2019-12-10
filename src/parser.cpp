@@ -21,6 +21,7 @@ AbstractScene* Parser::parse() {
         } else if (token == "Group") {
             parseTopGroup();
         } else {
+            std::cerr << token << std::endl;
             THROW_SYNTAX_ERROR(__FILE__, __LINE__);
         }
     }
@@ -154,6 +155,8 @@ Entity* Parser::parseEntity(const std::string& token, Material* currentMaterial)
             return parseBezierCurve(currentMaterial);
         else if (token == "RevSurface")
             return parseRevCurveSurface(currentMaterial);
+        else if (token == "FFDCage")
+            return parseFfdMesh(currentMaterial);
         else
             THROW_SYNTAX_ERROR(__FILE__, __LINE__);
 }
@@ -275,4 +278,30 @@ RevCurveSurface* Parser::parseRevCurveSurface(Material* material) {
     auto pc = dynamic_cast<Curve*>(parseEntity(curveName, material));
     BRACE_END();
     return new RevCurveSurface(pc, material);
+}
+
+FfdMesh* Parser::parseFfdMesh(Material* material) {
+    BRACE_BEGIN();
+    testToken("resolution");
+    GET(resX, int); GET(resY, int); GET(resZ, int);
+    testToken("geometry");
+    testToken("TriangleMesh");
+    BRACE_BEGIN();
+    GET_PARAMETER(obj_file, std::string);
+    BRACE_END();
+    auto res = new FfdMesh(obj_file.c_str(), resX, resY, resZ, Vector3f(), material);
+    try {
+        testToken("controls");
+        BRACE_BEGIN();
+        std::vector<Vector3f> controls;
+        int n = (resX + 1) * (resY + 1) * (resZ + 1);
+        for (int i = 0; i < n; i++) {
+            GET(vec, Vector3f);
+            controls.emplace_back(vec);
+        }
+        BRACE_END();
+        res->edit(controls);
+    } catch(...) {}
+    BRACE_END();
+    return res;
 }

@@ -70,6 +70,7 @@ private:
     Curve* parseBsplineCurve(Material* matetial);
     Curve* parseBezierCurve(Material* material);
     RevCurveSurface* parseRevCurveSurface(Material* material);
+    FfdMesh* parseFfdMesh(Material* material);
     bool getToken(std::string& token) {
         stream >> token;
         if (stream.eof()) return false;
@@ -78,7 +79,12 @@ private:
     void testToken(const char* c_token) {
         std::string token;
         getToken(token);
-        if (token != c_token) std::__throw_logic_error("[Error] Syntax error.");
+        if (token != c_token) {
+            std::string error = "[Error] Syntax error. \"";
+            error += c_token; error += "\" is expected. But \"";
+            error += token; error += "\" is found.";
+            std::__throw_logic_error(error.c_str());
+        }
     }
 
 };
